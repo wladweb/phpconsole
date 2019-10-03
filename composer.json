@@ -1,0 +1,35 @@
+{
+    "name": "wladweb/phpconsole",
+    "description": "PHP console microframework",
+    "type": "project",
+    "require": {
+        "php": ">=7.2",
+        "wladweb/servicelocator": "^1.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "wladweb",
+            "email": "wladwebwork@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Wladweb\\Phpconsole\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WladWeb\\Phpconsole\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/wladweb/ServiceLocator"
+        }
+    ]
+}
