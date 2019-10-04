@@ -9,20 +9,9 @@ if (PHPCONSOLE_DEBUG) {
 
 require_once 'vendor/autoload.php';
 
-$config = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
-$container = \Wladweb\ServiceLocator\Container::getContainer($config);
-$application = null;
-
+//$config = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
 try {
-    $application = $container->get('phpconsole');
-} catch (\Wladweb\ServiceLocator\Exceptions\NotFoundException $e) {
-    \Wladweb\Phpconsole\Logger::writeBad('Application class not found. Check config.');
-}
-
-if ($application) {
-    try {
-        $application->run();
-    } catch (\Wladweb\Phpconsole\Exceptions\LogException | \Wladweb\Phpconsole\Exceptions\RunTimeException $e) {
-        \Wladweb\Phpconsole\Logger::handle($e);
-    }
+    \Wladweb\Phpconsole\Application::run();
+} catch (\Wladweb\Phpconsole\Exceptions\LogException | \Wladweb\Phpconsole\Exceptions\RunTimeException $e) {
+    \Wladweb\Phpconsole\Logger::handle($e);
 }

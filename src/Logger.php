@@ -38,7 +38,7 @@ use Wladweb\Phpconsole\Application as App;
  */
 class Logger
 {
-    private const LOG_FILE = 'app.log';
+    private const LOG_FILE_INDEX = 'log_file_path';
 
     /**
      * Recieve & handle exceptions
@@ -85,13 +85,14 @@ class Logger
      */
     private static function getLogFileObject(): \SplFileObject
     {
-        $log_file_path = App::$app_dir . DIRECTORY_SEPARATOR . self::LOG_FILE;
+        $log_file_path = App::get(self::LOG_FILE_INDEX);
 
         try {
             $log_file = new \SplFileObject($log_file_path, 'a');
         } catch (\RuntimeException $e) {
             throw new RunTimeException("Сan not open the log file $log_file_path");
         }
+        return $log_file;
     }
 
     /**
@@ -105,11 +106,11 @@ class Logger
         $text = self::getTime() . ' ' . $text;
         $logfile_object = self::getLogFileObject();
         $bytes = $logfile_object->fwrite($text);
-        
-        if ($bytes === 0){
+
+        if ($bytes === 0) {
             throw new RunTimeException("Сan not write into log file");
         }
-        
+
         return $bytes;
     }
 
@@ -117,14 +118,14 @@ class Logger
      * Return log file size
      * @return string bytes
      */
-    public function getLogFileSize(): string
+    public static function getLogFileSize(): string
     {
         $logfile_object = self::getLogFileObject();
         $stat = $logfile_object->fstat();
-        $size_string = (string)$stat['size'] . ' bytes';
+        $size_string = (string) $stat['size'] . ' bytes';
         return $size_string;
     }
-    
+
     /**
      * Print any colored text into console
      * @param string $text Text
@@ -135,7 +136,7 @@ class Logger
     public static function write(string $text, string $color = '', string $background = ''): void
     {
         $palette = Colors::getPalette($color, $background);
-        $message = $palette . $text . " " . Colors::LINE_END;
+        $message = $palette . $text . Colors::LINE_END;
 
         echo $message;
     }
@@ -150,6 +151,17 @@ class Logger
     public static function writeLine(string $text, string $color = '', string $background = '')
     {
         echo self::getTime() . ' -- ';
+        self::writeSimpleLine($text, $color, $background);
+    }
+    
+    /**
+     * Print line without time string
+     * @param string $text
+     * @param string $color
+     * @param string $background
+     */
+    public static function writeSimpleLine(string $text, string $color = '', string $background = '')
+    {
         self::write($text, $color, $background);
         echo PHP_EOL;
     }
@@ -161,6 +173,21 @@ class Logger
     private static function getTime(): string
     {
         return \date('d.m.y H:i:s', \time());
+    }
+
+    /**
+     * 
+     * @param string $type Line symbol
+     * @param int $count Line length
+     * @param string $color Line color
+     * @return void
+     */
+    public static function drawLine(string $type = '~', int $count = 90, string $color = 'default'): void
+    {
+        for ($i = 1; $i <= $count; $i++) {
+            self::write($type, $color);
+        }
+        echo PHP_EOL;
     }
 
     public static function writeGood($text)

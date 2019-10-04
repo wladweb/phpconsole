@@ -26,6 +26,11 @@
 
 namespace Wladweb\Phpconsole;
 
+use Wladweb\ServiceLocator\Container;
+use Wladweb\ServiceLocator\Exceptions\NotFoundException;
+use Wladweb\Phpconsole\Logger;
+use Wladweb\Phpconsole\Exceptions\RunTimeException;
+
 /**
  * Application class
  *
@@ -33,5 +38,51 @@ namespace Wladweb\Phpconsole;
  */
 class Application
 {
-    //put your code here
+    private const CONFIG_FILE = 'config.php';
+
+    private static $app_opts = [];
+    public static $app_dir;
+    public static $container;
+
+    public static function run(): void
+    {
+        self::$app_dir = \realpath('.');
+        self::$container = Container::getContainer(self::$app_dir . DIRECTORY_SEPARATOR . self::CONFIG_FILE);
+        self::$app_opts = self::get('application');
+
+        if (self::$app_opts['show_header']) {
+            self::drawHeader();
+        }
+    }
+
+    public static function get(string $name, array $definition = [])
+    {
+        try {
+            $service = self::$container->get($name, []);
+        } catch (NotFoundException $e){
+            throw new RunTimeException("Service $name not found. Check config file");
+        }
+        return $service;
+    }
+    
+    /**
+     * Return application options
+     * @return array
+     */
+    public static function getOptions(): array
+    {
+        return self::$app_opts;
+    }
+    
+    private static function drawHeader(): void
+    {
+        Logger::drawLine();
+        
+        Logger::writeSimpleLine(self::$app_opts['name'], 'white', 'green');
+        Logger::writeSimpleLine('Version: ' . self::$app_opts['version']);
+        Logger::writeSimpleLine('Log file size: ' . Logger::getLogFileSize());
+        
+        Logger::drawLine();
+    }
+
 }
