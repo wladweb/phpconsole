@@ -29,6 +29,7 @@ namespace Wladweb\Phpconsole;
 use Wladweb\Phpconsole\Exceptions\LogException;
 use Wladweb\Phpconsole\Exceptions\RunTimeException;
 use Wladweb\Phpconsole\Utils\Colors;
+use Wladweb\Phpconsole\Application as App;
 
 /**
  * Write log, show color messages in bash console
@@ -37,24 +38,149 @@ use Wladweb\Phpconsole\Utils\Colors;
  */
 class Logger
 {
-    public static function handle()
-    {}
-    
-    private static function handleLogException(LogException $e){}
-    
-    private static function handleRunTimeException(RunTimeException $e){}
-    
-    public static function writeLog(string $text){}
+    private const LOG_FILE = 'app.log';
+
+    /**
+     * Recieve & handle exceptions
+     * @param \Exception $e
+     * @return void
+     */
+    public static function handle(\Exception $e): void
+    {
+        if ($e instanceof LogException) {
+            self::handleLogException($e);
+        } elseif ($e instanceof RunTimeException) {
+            self::handleRunTimeException($e);
+        } else {
+            echo $e->getMessage();
+        }
+    }
+
+    /**
+     * Formatting exception & write into log
+     * @param LogException $e
+     * @return void
+     */
+    private static function handleLogException(LogException $e): void
+    {
+        self::writeLog(' EXCEPTION: ' . $e->getCode() . ' -- ' . $e->getMessage());
+    }
+
+    /**
+     * Print colored exception message into console
+     * @param RunTimeException $e
+     * @return void
+     */
+    private static function handleRunTimeException(RunTimeException $e): void
+    {
+        self::write(' EXCEPTION: ', 'white', 'red');
+        self::write($e->getMessage(), 'red', 'white');
+        echo PHP_EOL;
+    }
+
+    /**
+     * Return log file object
+     * @return \SplFileObject
+     * @throws RunTimeException Can't open file
+     */
+    private static function getLogFileObject(): \SplFileObject
+    {
+        $log_file_path = App::$app_dir . DIRECTORY_SEPARATOR . self::LOG_FILE;
+
+        try {
+            $log_file = new \SplFileObject($log_file_path, 'a');
+        } catch (\RuntimeException $e) {
+            throw new RunTimeException("Сan not open the log file $log_file_path");
+        }
+    }
+
+    /**
+     * Add time string & write any text into log file
+     * @param string $text
+     * @return int
+     * @throws RunTimeException can't write into log file
+     */
+    public static function writeLog(string $text): int
+    {
+        $text = self::getTime() . ' ' . $text;
+        $logfile_object = self::getLogFileObject();
+        $bytes = $logfile_object->fwrite($text);
+        
+        if ($bytes === 0){
+            throw new RunTimeException("Сan not write into log file");
+        }
+        
+        return $bytes;
+    }
+
+    /**
+     * Return log file size
+     * @return string bytes
+     */
+    public function getLogFileSize(): string
+    {
+        $logfile_object = self::getLogFileObject();
+        $stat = $logfile_object->fstat();
+        $size_string = (string)$stat['size'] . ' bytes';
+        return $size_string;
+    }
     
     /**
-     * 
+     * Print any colored text into console
      * @param string $text Text
      * @param string $color Text color
      * @param string $background Backgound color
+     * @return void
      */
-    private static function write(string $text, string $color = '', string $background = ''){}
+    public static function write(string $text, string $color = '', string $background = ''): void
+    {
+        $palette = Colors::getPalette($color, $background);
+        $message = $palette . $text . " " . Colors::LINE_END;
 
-    public static function writeGood($text){}
-    public static function writeBad($text){}
-    public static function writeInfo($text){}
+        echo $message;
+    }
+
+    /**
+     * Print text & add time string & switch line
+     * @param string $text Text
+     * @param string $color Text color
+     * @param string $background Backgound color
+     * @return void
+     */
+    public static function writeLine(string $text, string $color = '', string $background = '')
+    {
+        echo self::getTime() . ' -- ';
+        self::write($text, $color, $background);
+        echo PHP_EOL;
+    }
+
+    /**
+     * Return formatted date string
+     * @return string
+     */
+    private static function getTime(): string
+    {
+        return \date('d.m.y H:i:s', \time());
+    }
+
+    public static function writeGood($text)
+    {
+        self::writeLine($text, 'white', 'green');
+    }
+
+    public static function writeBad($text)
+    {
+        self::writeLine($text, 'white', 'red');
+    }
+
+    public static function writeWarning($text)
+    {
+        self::writeLine($text, 'white', 'yellow');
+    }
+
+    public static function writeInfo($text)
+    {
+        self::writeLine($text, 'black', 'cyan');
+    }
+
 }

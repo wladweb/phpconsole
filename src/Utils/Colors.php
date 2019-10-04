@@ -41,6 +41,7 @@ class Colors
     private const COLOR_BLUE = 34;
     private const COLOR_MAGENTA = 35;
     private const COLOR_CYAN = 36;
+    private const COLOR_WHITE = 97;
     private const BG_DEFAULT = 49;
     private const BG_BLACK = 40;
     private const BG_RED = 41;
@@ -49,6 +50,7 @@ class Colors
     private const BG_BLUE = 44;
     private const BG_MAGENTA = 45;
     private const BG_CYAN = 46;
+    private const BG_WHITE = 107;
 
     private const LINE_START = "\e[";
     public const LINE_END = "\e[0m";
