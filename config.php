@@ -50,5 +50,10 @@ return [
     'controller_second' => [
         'value' => '\Wladweb\Phpconsole\Controllers\SecondController'
     ],
+    
+    //for Unit tests
+    'controller_non_extends_controller' => [
+        'value' => 'Wladweb\Phpconsole\Tests\Lib\NonExtendsController'
+    ]
 ];
 
