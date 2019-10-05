@@ -9,9 +9,8 @@ if (PHPCONSOLE_DEBUG) {
 
 require_once 'vendor/autoload.php';
 
-//$config = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
 try {
-    \Wladweb\Phpconsole\Application::run();
-} catch (\Wladweb\Phpconsole\Exceptions\LogException | \Wladweb\Phpconsole\Exceptions\RunTimeException $e) {
+    \Wladweb\Phpconsole\Application::run($argv);
+} catch (\Wladweb\Phpconsole\Exceptions\RunTimeException $e) {
     \Wladweb\Phpconsole\Logger::handle($e);
 }
