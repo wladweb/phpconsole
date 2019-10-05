@@ -20,6 +20,11 @@ class Application
     public static $app_dir;
     public static $container;
 
+    /**
+     * Point of entry
+     * @param type $arguments argv
+     * @return void
+     */
     public static function run($arguments): void
     {
         self::$app_dir = \realpath('.');
@@ -38,6 +43,13 @@ class Application
         self::drawFooter($time);
     }
 
+    /**
+     * Getting any services from container
+     * @param string $name service_index
+     * @param array $definition by this could redefine received service
+     * @return @mixed service (object, array, string, etc)
+     * @throws RunTimeException If service not found in container
+     */
     public static function get(string $name, array $definition = [])
     {
         try {

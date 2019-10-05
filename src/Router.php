@@ -12,6 +12,11 @@ use Wladweb\Phpconsole\Controllers\AbstractController;
  */
 class Router
 {
+    /**
+     * Resolve gotten arguments on controller, action, parameters
+     * @param array $arguments
+     * @return string working time
+     */
     public function run(array $arguments): string
     {
         array_shift($arguments); //remove script name
@@ -34,6 +39,19 @@ class Router
         return $this->process($controller, $action, $arguments);
     }
 
+    /**
+     * 
+     * @param string $controller_index array_index for get controller from container
+     * @param string $action action name
+     * @param array $params params for action method
+     * @return string working time
+     * 
+     * 1. If controller doesn't extend AbstractController
+     * 2. If action method doesn't exists
+     * 3. If parameters count less than expected
+     * 4. If parameters type is wrong
+     * @throws RunTimeException
+     */
     private function process(string $controller_index, string $action, array $params): string
     {
         $controller = App::get($controller_index);
